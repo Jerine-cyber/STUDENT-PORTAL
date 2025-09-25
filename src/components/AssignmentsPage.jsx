@@ -1,52 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react'; // 🔑 Added useState and useEffect
 import { useNavigate } from 'react-router-dom';
+import { FaBookOpen } from 'react-icons/fa'; // Added icon import
 
 const AssignmentsPage = () => {
   const navigate = useNavigate();
+  // 🔑 State to store the fetched assignments
+  const [studentAssignments, setStudentAssignments] = useState([]); 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Dummy data for academic assignments
-  const studentAssignments = [
-    {
-      id: 1,
-      title: "Data Structures Project",
-      subject: "Computer Science II",
-      dueDate: "2025-10-15",
-      status: "Submitted",
-      grade: "A-",
-    },
-    {
-      id: 2,
-      title: "Literary Analysis Essay",
-      subject: "English Literature",
-      dueDate: "2025-10-20",
-      status: "Graded",
-      grade: "B+",
-    },
-    {
-      id: 3,
-      title: "Chemistry Lab Report",
-      subject: "Chemistry",
-      dueDate: "2025-10-25",
-      status: "Pending",
-      grade: null,
-    },
-    {
-      id: 4,
-      title: "World History Presentation",
-      subject: "World History",
-      dueDate: "2025-11-05",
-      status: "Submitted",
-      grade: null,
-    },
-    {
-      id: 5,
-      title: "Algorithms Midterm Review",
-      subject: "Algorithms",
-      dueDate: "2025-11-10",
-      status: "Pending",
-      grade: null,
-    },
-  ];
+  // 🔑 useEffect to fetch data from the Express backend
+  useEffect(() => {
+    const fetchAssignments = async () => {
+      try {
+        // 🔑 Fetch data from the Express Backend URL
+        const response = await fetch('http://localhost:3001/api/assignments'); 
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setStudentAssignments(data);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch assignments:", err);
+        setError("Failed to load assignments. Is the backend server running on port 3001?");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAssignments();
+  }, []); // Runs once on component mount
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -76,13 +60,35 @@ const AssignmentsPage = () => {
     }
   };
 
+  // --- Loading and Error States ---
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-white bg-gray-900">
+        <FaBookOpen className="w-10 h-10 mr-3 text-indigo-400 animate-pulse" /> 
+        Loading Assignments...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-10 text-red-400 bg-gray-900">
+        <h1 className="mb-4 text-2xl">Data Load Failed!</h1>
+        <p className="text-center">{error}</p>
+        <p className="mt-4 text-sm text-gray-400">Please ensure your Node.js server is running on http://localhost:3001.</p>
+      </div>
+    );
+  }
+  // ---------------------------------
+
   return (
     <div className="relative min-h-screen p-6 overflow-hidden font-sans text-white sm:p-10 bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-950">
-      {/* Abstract Background Elements for 3D feel */}
+      
+      {/* Abstract Background Elements (Unchanged) */}
       <div className="absolute inset-0 z-0 opacity-40">
-        <div className="absolute bg-blue-500 rounded-full top-1/4 left-1/4 w-80 h-80 mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
-        <div className="absolute bg-purple-500 rounded-full top-1/2 right-1/4 w-96 h-96 mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
-        <div className="absolute bg-pink-500 rounded-full bottom-1/4 left-1/3 w-72 h-72 mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+        <div className="absolute bg-blue-500 rounded-full top-1/4 left-1/4 w-80 h-80 mix-blend-multiply filter blur-xl opacity-30"></div>
+        <div className="absolute bg-purple-500 rounded-full top-1/2 right-1/4 w-96 h-96 mix-blend-multiply filter blur-xl opacity-30"></div>
+        <div className="absolute bg-pink-500 rounded-full bottom-1/4 left-1/3 w-72 h-72 mix-blend-multiply filter blur-xl opacity-30"></div>
       </div>
 
       <div className="relative z-10 w-full max-w-4xl p-8 mx-auto transition-all duration-300 transform bg-white border border-white bg-opacity-10 border-opacity-20 backdrop-filter backdrop-blur-lg rounded-3xl shadow-3d-dark">
@@ -95,7 +101,9 @@ const AssignmentsPage = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
           </button>
-          <h1 className="text-3xl font-extrabold text-white sm:text-4xl">Assignments</h1>
+          <h1 className="flex items-center text-3xl font-extrabold text-white sm:text-4xl">
+            <FaBookOpen className="mr-3 text-blue-400" /> Academic Assignments
+          </h1>
         </div>
 
         {/* Assignments List */}

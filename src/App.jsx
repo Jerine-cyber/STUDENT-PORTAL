@@ -7,7 +7,6 @@ import { auth } from './firebase';
 import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignupPage';
 import Dashboard from './components/Dashboard';
-import PageTemplate from './components/PageTemplate';
 import TodoPage from './components/TodoPage';
 import ResultsPage from './components/ResultsPage';
 import AssignmentsPage from './components/AssignmentsPage';
