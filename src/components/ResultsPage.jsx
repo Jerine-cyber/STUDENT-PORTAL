@@ -1,36 +1,47 @@
-import React, { useState, useEffect } from 'react'; // 🔑 Added useState and useEffect
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaGraduationCap } from 'react-icons/fa'; // Added icon import
 
 const ResultsPage = () => {
   const navigate = useNavigate();
-  // 🔑 State to store the fetched results
-  const [studentResults, setStudentResults] = useState(null); 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // 🔑 useEffect to fetch data from the Express backend
-  useEffect(() => {
-    const fetchResults = async () => {
-      try {
-        // 🔑 Fetch data from the endpoint defined in server/index.js
-        const response = await fetch('http://localhost:3001/api/results'); 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setStudentResults(data);
-        setError(null);
-      } catch (err) {
-        console.error("Failed to fetch results:", err);
-        setError("Failed to load results. Is the backend server running on port 3001?");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchResults();
-  }, []); // Empty dependency array means this runs once on mount
+  // Dummy data for academic results
+  const studentResults = {
+    name: "Jerine Joshwa",
+    id: "23becy018",
+    semesters: [
+      {
+        semester: "Semester 1",
+        gpa: 3.85,
+        subjects: [
+          { name: "Mathematics I", grade: "A", score: 92 },
+          { name: "Physics", grade: "A-", score: 88 },
+          { name: "Computer Science I", grade: "A", score: 95 },
+          { name: "English Literature", grade: "B+", score: 87 },
+          { name: "Chemistry", grade: "B", score: 82 },
+        ],
+      },
+      {
+        semester: "Semester 2",
+        gpa: 4.00,
+        subjects: [
+          { name: "Mathematics II", grade: "A+", score: 98 },
+          { name: "Computer Science II", grade: "A", score: 94 },
+          { name: "Data Structures", grade: "A", score: 91 },
+          { name: "World History", grade: "A", score: 93 },
+        ],
+      },
+      {
+        semester: "Semester 3",
+        gpa: 3.75,
+        subjects: [
+          { name: "Database Systems", grade: "A-", score: 89 },
+          { name: "Algorithms", grade: "B+", score: 85 },
+          { name: "Operating Systems", grade: "A", score: 90 },
+          { name: "Communication Skills", grade: "A", score: 96 },
+        ],
+      },
+    ],
+  };
 
   const getGradeColor = (grade) => {
     switch (grade) {
@@ -47,36 +58,14 @@ const ResultsPage = () => {
         return 'text-red-400';
     }
   };
-  
-  // --- Loading and Error States ---
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen text-white bg-gray-900">
-        <FaGraduationCap className="w-10 h-10 mr-3 text-indigo-400 animate-pulse" /> 
-        Loading Academic Data...
-      </div>
-    );
-  }
-
-  if (error || !studentResults) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-10 text-red-400 bg-gray-900">
-        <h1 className="mb-4 text-2xl">Data Load Failed!</h1>
-        <p className="text-center">{error}</p>
-        <p className="mt-4 text-sm text-gray-400">Please ensure your Node.js server is running on http://localhost:3001.</p>
-      </div>
-    );
-  }
-  // ---------------------------------
 
   return (
     <div className="relative min-h-screen p-6 overflow-hidden font-sans text-white sm:p-10 bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-950">
-      
-      {/* Abstract Background Elements (Tailwind CSS animation required for blob/filter classes) */}
+      {/* Abstract Background Elements for 3D feel */}
       <div className="absolute inset-0 z-0 opacity-40">
-        <div className="absolute bg-blue-500 rounded-full top-1/4 left-1/4 w-80 h-80 mix-blend-multiply filter blur-xl opacity-30"></div>
-        <div className="absolute bg-purple-500 rounded-full top-1/2 right-1/4 w-96 h-96 mix-blend-multiply filter blur-xl opacity-30"></div>
-        <div className="absolute bg-pink-500 rounded-full bottom-1/4 left-1/3 w-72 h-72 mix-blend-multiply filter blur-xl opacity-30"></div>
+        <div className="absolute bg-blue-500 rounded-full top-1/4 left-1/4 w-80 h-80 mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+        <div className="absolute bg-purple-500 rounded-full top-1/2 right-1/4 w-96 h-96 mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+        <div className="absolute bg-pink-500 rounded-full bottom-1/4 left-1/3 w-72 h-72 mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
       </div>
 
       <div className="relative z-10 w-full max-w-4xl p-8 mx-auto transition-transform duration-300 bg-white border border-white bg-opacity-10 border-opacity-20 backdrop-filter backdrop-blur-lg rounded-3xl shadow-3d-dark">
@@ -108,7 +97,7 @@ const ResultsPage = () => {
             
             <div className="space-y-3">
               {semester.subjects.map((subject, subjectIndex) => (
-                <div key={subjectIndex} className="flex items-center justify-between p-4 transition-transform duration-200 bg-white border border-white rounded-lg bg-opacity-10 shadow-inner-white border-opacity-10 hover:bg-opacity-20 hover:scale-[1.02]">
+                <div key={subjectIndex} className="flex items-center justify-between p-4 transition-transform duration-200 bg-white border border-white rounded-lg bg-opacity-10 shadow-inner-white border-opacity-10 hover:bg-opacity-20 hover:scale-105">
                   <span className="font-medium text-white">{subject.name}</span>
                   <div className="flex items-center space-x-4">
                     <span className={`text-lg ${getGradeColor(subject.grade)}`}>{subject.grade}</span>
