@@ -1,6 +1,14 @@
-import React, { useState, useEffect } from 'react'; // 🔑 Import useState and useEffect
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaBookOpen } from 'react-icons/fa'; // Import icon
+
+// --- Dummy Data (Used as a fallback) ---
+const DUMMY_ASSIGNMENTS_DATA = [
+    { id: 1, title: "Data Structures Project: Linked Lists", subject: "Computer Science II", dueDate: "2025-10-15", status: "Pending", grade: null, color: "yellow" },
+    { id: 2, title: "Literary Analysis Essay: Gatsby", subject: "English Literature", dueDate: "2025-10-20", status: "Graded", grade: "A-", color: "green" },
+    { id: 3, title: "Chemistry Lab Report: Titration", subject: "Chemistry", dueDate: "2025-10-25", status: "Pending", grade: null, color: "yellow" },
+    { id: 6, title: "Database Query Optimization Exercise", subject: "Database Systems", dueDate: "2025-10-10", status: "Graded", grade: "A+", color: "green" },
+];
 
 const AssignmentsPage = () => {
     const navigate = useNavigate();
@@ -14,7 +22,7 @@ const AssignmentsPage = () => {
     useEffect(() => {
         const fetchAssignments = async () => {
             try {
-                // 🔑 Fetch data from the Express Backend URL (Node.js/MongoDB API)
+                // Fetch data from the Express Backend URL (Node.js/MongoDB API)
                 const response = await fetch('http://localhost:3001/api/assignments'); 
                 
                 if (!response.ok) {
@@ -27,7 +35,7 @@ const AssignmentsPage = () => {
             } catch (err) {
                 console.error("Failed to fetch assignments:", err);
                 setError("Failed to load assignments. Please ensure the backend is running on port 3001.");
-                setStudentAssignments([]); // Clear data on failure
+                setStudentAssignments(DUMMY_ASSIGNMENTS_DATA); // Fallback to dummy data
             } finally {
                 setLoading(false);
             }
@@ -74,7 +82,7 @@ const AssignmentsPage = () => {
         );
     }
 
-    if (error) {
+    if (error && studentAssignments.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen p-10 text-red-400 bg-gray-900">
                 <h1 className="mb-4 text-2xl">Data Load Failed!</h1>
@@ -144,7 +152,7 @@ const AssignmentsPage = () => {
                         ))
                     ) : (
                         <div className="p-10 text-center text-gray-400 bg-white bg-opacity-5 rounded-xl">
-                            No assignments found or backend data is empty.
+                            No assignments found. Time to relax! 🎉
                         </div>
                     )}
                 </div>

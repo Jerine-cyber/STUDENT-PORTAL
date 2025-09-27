@@ -10,6 +10,12 @@ const app = express();
 const PORT = process.env.PORT || 3001; 
 const FRONTEND_URL = 'http://localhost:5173'; 
 
+const studentResults = { 
+    name: "Jerine Joshwa", // Used for profile
+    id: "23becy018",      // Used for profile
+    // ... semesters array ...
+};
+
 // --- Middleware Setup ---
 app.use(cors({ origin: FRONTEND_URL, credentials: true }));
 app.use(express.json());

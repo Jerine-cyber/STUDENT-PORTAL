@@ -1,78 +1,78 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './firebase';
+// src/App.jsx (Corrected Imports and Component Mapping)
 
-// Import all components
-import LoginPage from './components/LoginPage';
-import SignupPage from './components/SignupPage';
-import Dashboard from './components/Dashboard';
-import TodoPage from './components/TodoPage';
-import ResultsPage from './components/ResultsPage';
-import AssignmentsPage from './components/AssignmentsPage';
-import AttendancePage from './components/AttendancePage';
-import GamesPage from './components/GamesPage';
-import CalendarPage from './components/CalendarPage';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './firebase'; 
+
+// 🔑 CORRECTED Imports: All pages are assumed to be in ./pages/ and named correctly.
+import LoginPage from './components/LoginPage.jsx'; // Corrected Path/Name
+import SignupPage from './components/SignupPage.jsx';
+import Dashboard from './components/Dashboard.jsx';
+import TodoPage from './components/TodoPage.jsx';
+import ResultsPage from './components/ResultsPage.jsx';
+import AssignmentsPage from './components/AssignmentsPage.jsx';
+import AttendancePage from './components/AttendancePage.jsx';
+import GamesPage from './components/GamesPage.jsx';
+import CalendarPage from './components/CalendarPage.jsx';
+import ProfilePage from './components/ProfilePage.jsx'; // Assuming ProfilePage is correctly named and located
 
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [tasks, setTasks] = useState([
-    { id: 1, text: "Finish React UI Components", completed: false },
-    { id: 2, text: "Prepare for a quiz", completed: true },
-    { id: 3, text: "Read Chapter 5 of textbook", completed: false }
-  ]);
-  
-  // State to track if the authentication check is complete
-  const [loading, setLoading] = useState(true);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-  // This hook runs once on component mount to check the user's auth state
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      // 'user' is null if not authenticated, or a user object if authenticated
-      setIsAuthenticated(!!user);
-      // Once the check is done, set loading to false
-      setLoading(false);
-    });
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            setIsAuthenticated(!!user);
+            setLoading(false);
+        });
+        return () => unsubscribe();
+    }, []);
 
-    // Clean up the subscription on unmount
-    return () => unsubscribe();
-  }, []);
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-gray-900">
+                <p className="text-xl text-white">Checking authentication...</p>
+            </div>
+        );
+    }
 
-  // Show a loading screen while the auth state is being checked
-  if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <p>Checking authentication...</p>
-      </div>
+        <Router>
+            <Routes>
+                {/* AUTH PAGES */}
+                <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} />} />
+                <Route path="/signup" element={<SignupPage setIsAuthenticated={setIsAuthenticated} />} />
+
+                {/* DASHBOARD NESTED ROUTE STRUCTURE (Correct) */}
+                <Route
+                    path="/dashboard"
+                    element={isAuthenticated ? <Dashboard setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/login" replace />}
+                >
+                    {/* The index route renders the default content */}
+                    <Route index element={
+                        <div className="p-10 mt-4 text-center bg-gray-800 rounded-xl">
+                            <h2 className="text-3xl font-bold text-blue-400">Select an item from the sidebar.</h2>
+                            <p className="mt-3 text-gray-400">Welcome back!</p>
+                        </div>
+                    } />
+                    
+                    {/* Child Routes rendering inside <Outlet /> */}
+                    <Route path="profile" element={<ProfilePage />} />
+                    <Route path="results" element={<ResultsPage />} />
+                    <Route path="assignments" element={<AssignmentsPage />} />
+                    <Route path="attendance" element={<AttendancePage />} />
+                    <Route path="games" element={<GamesPage />} />
+                    <Route path="todo" element={<TodoPage />} />
+                    <Route path="calendar" element={<CalendarPage />} />
+                    
+                </Route>
+                
+                {/* DEFAULT REDIRECT */}
+                <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
+            </Routes>
+        </Router>
     );
-  }
-
-  return (
-    <Router>
-      <Routes>
-        {/* AUTH PAGES */}
-        <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} />} />
-        <Route path="/signup" element={<SignupPage setIsAuthenticated={setIsAuthenticated} />} />
-
-        {/* DASHBOARD MAIN ROUTE (Protected) */}
-        <Route
-          path="/dashboard"
-          element={isAuthenticated ? <Dashboard setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/login" replace />}
-        />
-
-        {/* DASHBOARD SUB-ROUTES (Protected) */}
-        <Route path="/dashboard/results" element={isAuthenticated ? <ResultsPage /> : <Navigate to="/login" replace />} />
-        <Route path="/dashboard/assignments" element={isAuthenticated ? <AssignmentsPage /> : <Navigate to="/login" replace />} />
-        <Route path="/dashboard/attendance" element={isAuthenticated ? <AttendancePage /> : <Navigate to="/login" replace />} />
-        <Route path="/dashboard/games" element={isAuthenticated ? <GamesPage /> : <Navigate to="/login" replace />} />
-        <Route path="/dashboard/todo" element={isAuthenticated ? <TodoPage tasks={tasks} setTasks={setTasks} /> : <Navigate to="/login" replace />} />
-        <Route path="/dashboard/calendar" element={isAuthenticated ? <CalendarPage /> : <Navigate to="/login" replace />} />
-        
-        {/* DEFAULT REDIRECT */}
-        <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
-      </Routes>
-    </Router>
-  );
 };
 
 export default App;
