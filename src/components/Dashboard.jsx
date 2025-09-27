@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { FaBars, FaTimes, FaSignOutAlt, FaTachometerAlt } from 'react-icons/fa';
-import { motion } from 'framer-motion'; // 👈 Import Framer Motion
+import { motion } from 'framer-motion'; // 👈 Framer Motion is essential for the animation
 // ⚠️ Assuming the handleLogout function is imported correctly from your Firebase setup
 import { handleLogout } from '../firebase'; 
 
@@ -9,11 +9,11 @@ const Dashboard = ({ setIsAuthenticated }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const studentName = "Jerine Joshwa"; // 👈 Example dynamic user name
+  const studentName = "Jerine Joshwa"; // Example dynamic user name
 
   // Navigation Data - Using icons for a professional look
   const navItems = [
-    { name: "Dashboard", path: "", icon: "🏠", baseRoute: true }, // Base route
+    { name: "Dashboard", path: "", icon: "🏠", baseRoute: true },
     { name: "Results", path: "results", icon: "📊" },
     { name: "Assignments", path: "assignments", icon: "📝" },
     { name: "Attendance", path: "attendance", icon: "🗓️" },
@@ -24,6 +24,7 @@ const Dashboard = ({ setIsAuthenticated }) => {
 
   const onLogout = async () => {
     // await handleLogout(); // Firebase logout
+    // setIsAuthenticated(false); // Optional state update
     navigate('/login');
   };
   
@@ -31,8 +32,10 @@ const Dashboard = ({ setIsAuthenticated }) => {
       const currentPath = location.pathname.split('/').pop() || '';
       const targetPath = path || '';
       
+      // Checks for the base path: /dashboard
       if (path === '' && location.pathname.endsWith('/dashboard')) return true;
       
+      // Checks for sub-paths: /dashboard/results
       return currentPath === targetPath;
   };
 
@@ -68,7 +71,7 @@ const Dashboard = ({ setIsAuthenticated }) => {
           <div className={`text-xl font-extrabold text-blue-400 overflow-hidden transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
             STUDENT PORTAL
           </div>
-          {/* Toggle Button (Visible on all sizes) */}
+          {/* Toggle Button */}
           <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 text-white rounded-full hover:text-blue-400 hover:bg-gray-700">
             {isSidebarOpen ? <FaTimes className="w-6 h-6" /> : <FaBars className="w-6 h-6" />}
           </button>
@@ -115,7 +118,7 @@ const Dashboard = ({ setIsAuthenticated }) => {
       <div 
         className={`flex-1 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'ml-64' : 'ml-20'}`}
       >
-          {/* Header/Greeting Bar (Placeholder for main content) */}
+          {/* Sticky Header/Greeting Bar */}
           <div className="sticky top-0 z-20 flex items-center justify-between p-6 bg-gray-900 border-b border-indigo-900 shadow-2xl">
               <div>
                   <h1 className="text-3xl font-extrabold text-white">
@@ -127,7 +130,7 @@ const Dashboard = ({ setIsAuthenticated }) => {
           {/* Dynamic Content Display Area */}
           <main className="p-4 sm:p-8">
               {isActive('') ? (
-                  // 👈 NEW: Animated 3D Welcome Message
+                  // ANIMATED 3D Welcome Message
                   <motion.div
                       className="p-10 mt-4 text-center transform bg-gradient-to-br from-indigo-800 to-purple-900 rounded-3xl shadow-3xl perspective-1000 rotate-x-2 translate-z-10"
                       variants={containerVariants}
@@ -147,14 +150,14 @@ const Dashboard = ({ setIsAuthenticated }) => {
                           Explore your academic journey and tools on the left.
                       </motion.p>
                       
-                      {/* Optional: Add a subtle animated background blob for extra flair */}
+                      {/* Animated Background Blobs */}
                       <div className="absolute inset-0 z-0 opacity-20">
                           <div className="absolute w-48 h-48 bg-blue-500 rounded-full top-1/4 left-1/4 mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
                           <div className="absolute w-56 h-56 bg-purple-500 rounded-full bottom-1/3 right-1/4 mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
                       </div>
                   </motion.div>
               ) : (
-                  <Outlet /> // Renders the content of the matched route (e.g., ResultsPage)
+                  <Outlet /> // Renders the content of the matched sub-route
               )}
           </main>
       </div>
